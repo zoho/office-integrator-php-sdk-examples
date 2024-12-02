@@ -1,5 +1,5 @@
 {
-    "name": "officeintegrator/zoi-php-sdk-examples",
+    "name": "zohocorporation/office-integrator-sdk-examples",
     "authors": [
         {
             "name": "prabakaran.r",
@@ -12,6 +12,6 @@
         }
     },
     "require": {
-        "officeintegrator/zoi-php-sdk": "*"
+        "zohocorporation/office-integrator-sdk": "*"
     }
 }
