@@ -12,7 +12,7 @@ Zoho Office Integrator PHP SDK used to help you quickly integrator Zoho Office I
     git clone https://github.com/zoho/office-integrator-php-sdk-examples.git
     ```
 
-- Install [**Office Integrator PHP SDK**](https://packagist.org/packages/officeintegrator/zoi-php-sdk) and other dependencies 
+- Install [**Office Integrator PHP SDK**](https://packagist.org/packages/zohocorporation/office-integrator-sdk) and other dependencies 
     - Navigate to the folder **office-integrator-php-sdk-examples**
         ```sh
         cd office-integrator-php-sdk-examples
