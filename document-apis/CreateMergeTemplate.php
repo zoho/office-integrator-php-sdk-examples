@@ -6,7 +6,7 @@ require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 
 use com\zoho\api\authenticator\AuthBuilder;
-use com\zoho\officeintegrator\dc\apiserver\Production;
+use com\zoho\officeintegrator\dc\datacenter\Production;
 use com\zoho\officeintegrator\InitializeBuilder;
 use com\zoho\officeintegrator\logger\Levels;
 use com\zoho\officeintegrator\logger\LogBuilder;
@@ -108,14 +108,14 @@ class CreateMergeTemplate {
 
             # Optional Configuration
             $permissions = [
-                "document.export" => true,
-                "document.print" => false,
-                "document.edit" => true,
-                "review.comment" => false,
-                "review.changes.resolve" => false,
-                "collab.chat" => false,
-                "document.pausecollaboration" => false,
-                "document.fill" => false
+                "document.export" => "true",
+                "document.print" => "false",
+                "document.edit" => "true",
+                "review.comment" => "false",
+                "review.changes.resolve" => "false",
+                "collab.chat" => "false",
+                "document.pausecollaboration" => "false",
+                "document.fill" => "false"
             ];
 
             $templateParameters->setPermissions($permissions);
