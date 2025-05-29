@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 
 use com\zoho\api\authenticator\AuthBuilder;
-use com\zoho\officeintegrator\dc\apiserver\Production;
+use com\zoho\officeintegrator\dc\datacenter\Production;
 use com\zoho\officeintegrator\InitializeBuilder;
 use com\zoho\officeintegrator\logger\Levels;
 use com\zoho\officeintegrator\logger\LogBuilder;
@@ -66,9 +66,9 @@ class CreateSpreadsheet {
             # Optional Configuration
             $permissions = array();
 
-            $permissions["document.export"] = true;
-            $permissions["document.print"] = false;
-            $permissions["document.edit"] = true;
+            $permissions["document.export"] = "true";
+            $permissions["document.print"] = "true";
+            $permissions["document.edit"] = "true";
 
             $parameters->setPermissions($permissions);
 

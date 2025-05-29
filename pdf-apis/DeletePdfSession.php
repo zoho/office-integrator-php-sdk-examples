@@ -11,14 +11,13 @@ use com\zoho\officeintegrator\logger\Levels;
 use com\zoho\officeintegrator\logger\LogBuilder;
 use com\zoho\officeintegrator\v1\Authentication;
 use com\zoho\officeintegrator\v1\CreateDocumentResponse;
-use com\zoho\officeintegrator\v1\CreatePresentationParameters;
+use com\zoho\officeintegrator\v1\DocumentSessionDeleteSuccessResponse;
 use com\zoho\officeintegrator\v1\InvalidConfigurationException;
-use com\zoho\officeintegrator\v1\DocumentInfo;
-use com\zoho\officeintegrator\v1\FileDeleteSuccessResponse;
+use com\zoho\officeintegrator\v1\EditPdfParameters;
 use com\zoho\officeintegrator\v1\V1Operations;
 use Exception;
 
-class DeletePresentation {
+class DeletePdfSession {
 
     //Refer API documentation - https://www.zoho.com/officeintegrator/api/v1/zoho-show-delete-presentation.html
     public static function execute() {
@@ -28,17 +27,12 @@ class DeletePresentation {
 
         try {
             $sdkOperations = new V1Operations();
-            $parameters = new CreatePresentationParameters();
+            $parameters = new EditPdfParameters();
 
-            $documentInfo = new DocumentInfo();
+            $url = 'https://demo.office-integrator.com/zdocs/EventForm.pdf';
+            $parameters->setUrl($url);
 
-            // Time value used to generate a unique document every time. You can replace it based on your application.
-            $documentInfo->setDocumentId(strval(time()));
-            $documentInfo->setDocumentName("New Presentation");
-
-            $parameters->setDocumentInfo($documentInfo);
-
-            $responseObject = $sdkOperations->createPresentation($parameters);
+            $responseObject = $sdkOperations->editPdf($parameters);
 
             if ($responseObject != null) {
                 // Get the status code from response
@@ -50,11 +44,11 @@ class DeletePresentation {
                 if ($presentationResponseObject != null) {
                     // Check if the expected CreateDocumentResponse instance is received
                     if ($presentationResponseObject instanceof CreateDocumentResponse) {
-                        $presentationId = $presentationResponseObject->getDocumentId();
+                        $sessionId = $presentationResponseObject->getSessionId();
 
-                        echo "\nPresentation ID to be deleted - " . $presentationId . "\n";
+                        echo "\nPdf Session ID to be deleted - " . $sessionId . "\n";
 
-                        $deleteApiResponse = $sdkOperations->deletePresentation($presentationId);
+                        $deleteApiResponse = $sdkOperations->deletePdfDocumentSession($sessionId);
 
                         if ($deleteApiResponse != null) {
                             // Get the status code from response
@@ -65,8 +59,8 @@ class DeletePresentation {
             
                             if ($deleteResponseObject != null) {
                                 // Check if the expected CreateDocumentResponse instance is received
-                                if ($deleteResponseObject instanceof FileDeleteSuccessResponse) {            
-                                    echo "\nPresentation delete status :  - " . $deleteResponseObject->getDocDelete() . "\n";
+                                if ($deleteResponseObject instanceof DocumentSessionDeleteSuccessResponse) {            
+                                    echo "\nPdf session delete status :  - " . $deleteResponseObject->getSessionDeleted() . "\n";
                                 } elseif ($deleteResponseObject instanceof InvalidConfigurationException) {
                                     echo "\nInvalid configuration exception." . "\n";
                                     echo "\nError Code - " . $deleteResponseObject->getCode() . "\n";
@@ -131,5 +125,4 @@ class DeletePresentation {
     }
 }
 
-DeletePresentation::execute();
-
+DeletePdfSession::execute();

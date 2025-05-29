@@ -12,17 +12,14 @@ use com\zoho\officeintegrator\logger\LogBuilder;
 use com\zoho\officeintegrator\v1\Authentication;
 use com\zoho\officeintegrator\v1\CreateDocumentResponse;
 use com\zoho\officeintegrator\v1\InvalidConfigurationException;
-use com\zoho\officeintegrator\v1\CreateDocumentParameters;
-use com\zoho\officeintegrator\v1\SessionInfo;
-use com\zoho\officeintegrator\v1\SessionMeta;
-use com\zoho\officeintegrator\v1\SessionUserInfo;
-use com\zoho\officeintegrator\v1\UserInfo;
+use com\zoho\officeintegrator\v1\DocumentMeta;
+use com\zoho\officeintegrator\v1\EditPdfParameters;
 use com\zoho\officeintegrator\v1\V1Operations;
 use Exception;
 
-class GetSessionDetails {
+class GetPdfDocumentDetails {
 
-    //Refer API documentation - https://www.zoho.com/officeintegrator/api/v1/zoho-writer-session-information.html
+    //Refer API documentation - https://www.zoho.com/officeintegrator/api/v1/zoho-writer-document-details.html
     public static function execute() {
         // Initializing SDK once is enough. Calling here since the code sample will be tested standalone. 
         // You can place SDK initializer code in your application and call it once while your application starts up.
@@ -30,18 +27,12 @@ class GetSessionDetails {
 
         try {
             $sdkOperations = new V1Operations();
-            $createDocumentParameters = new CreateDocumentParameters();
+            $parameters = new EditPdfParameters();
 
-            $userInfo = new UserInfo();
+            $url = 'https://demo.office-integrator.com/zdocs/EventForm.pdf';
+            $parameters->setUrl($url);
 
-            $userInfo->setUserId("1000");
-            $userInfo->setDisplayName("Prabakaran R");
-
-            $createDocumentParameters->setUserInfo($userInfo);
-
-            echo "\nCreating a document to demonstrate get document session information api";
-
-            $responseObject = $sdkOperations->createDocument($createDocumentParameters);
+            $responseObject = $sdkOperations->editPdf($parameters);
 
             if ($responseObject != null) {
                 // Get the status code from response
@@ -53,50 +44,39 @@ class GetSessionDetails {
                 if ($writerResponseObject != null) {
                     // Check if the expected CreateDocumentResponse instance is received
                     if ($writerResponseObject instanceof CreateDocumentResponse) {
-                        $sessionId = $writerResponseObject->getSessionId();
+                        $documentId = $writerResponseObject->getDocumentId();
+
+                        echo "\nCreated Document ID : " . $documentId . "\n";
                         
-                        echo "\nInvoking document session information api";
+                        $documentDetailsResponse = $sdkOperations->getPdfDocumentInfo($documentId);
 
-                        $sessionsResponse = $sdkOperations->getSession($sessionId);
-
-                        if ($sessionsResponse != null) {
+                        if ($documentDetailsResponse != null) {
                             // Get the status code from response
-                            echo "\nStatus Code: " . $sessionsResponse->getStatusCode() . "\n";
+                            echo "\nStatus Code: " . $documentDetailsResponse->getStatusCode() . "\n";
             
                             // Get the api response object from responseObject
-                            $sessionsResponseObj = $sessionsResponse->getObject();
+                            $documentDetailsResponseObj = $documentDetailsResponse->getObject();
             
-                            if ($sessionsResponseObj != null) {
+                            if ($documentDetailsResponseObj != null) {
                                 // Check if the expected CreateDocumentResponse instance is received
-                                if ($sessionsResponseObj instanceof SessionMeta) {            
-                                        echo "\nSession Status : " . $sessionsResponseObj->getStatus();
-
-                                        $sessionInfo = $sessionsResponseObj->getInfo();
-
-                                        if ($sessionInfo instanceof SessionInfo) {
-                                            echo "\nSession Session - Document ID  : " . $sessionInfo->getDocumentId();
-                                            echo "\nSession Session URL : " . $sessionInfo->getSessionUrl();
-                                            echo "\nSession Session Delete URL : " . $sessionInfo->getSessionDeleteUrl();
-                                            echo "\nSession Session Created Time : " . $sessionInfo->getCreatedTime();
-                                            echo "\nSession Session Created Timestamp  : " . $sessionInfo->getCreatedTimeMs();
-                                            echo "\nSession Session Expiry Time  : " . $sessionInfo->getExpiresOn();
-                                            echo "\nSession Session Expiry Timestamp  : " . $sessionInfo->getExpiresOnMs();
-                                        }
-                                        $sessionUserInfo = $sessionsResponseObj->getUserInfo();
-
-                                        if ($sessionUserInfo instanceof SessionUserInfo) {
-                                            echo "\nSession User ID : " . $sessionUserInfo->getUserId();
-                                            echo "\nSession User DisplayName  : " . $sessionUserInfo->getDisplayName();
-                                        }
-                                } elseif ($sessionsResponseObj instanceof InvalidConfigurationException) {
+                                if ($documentDetailsResponseObj instanceof DocumentMeta) {            
+                                    echo "\nPdf Document ID :  - " . $documentDetailsResponseObj->getDocumentId() . "\n";
+                                    echo "\nPdf Document Name :  - " . $documentDetailsResponseObj->getDocumentName() . "\n";
+                                    echo "\nPdf Document Type :  - " . $documentDetailsResponseObj->getDocumentType() . "\n";
+                                    echo "\nPdf Document Collaborators Count :" . $documentDetailsResponseObj->getCollaboratorsCount() . "\n";
+                                    echo "\nPdf Document Created Time :  - " . $documentDetailsResponseObj->getCreatedTime() . "\n";
+                                    echo "\nPdf Document Created Timestamp :  - " . $documentDetailsResponseObj->getCreatedTimeMs() . "\n";
+                                    echo "\nPdf Document Expiry Time :  - " . $documentDetailsResponseObj->getExpiresOn() . "\n";
+                                    echo "\nPdf Document Expiry Timestamp :  - " . $documentDetailsResponseObj->getExpiresOnMs() . "\n";
+                                } elseif ($documentDetailsResponseObj instanceof InvalidConfigurationException) {
                                     echo "\nInvalid configuration exception." . "\n";
-                                    echo "\nError Code - " . $sessionsResponseObj->getCode() . "\n";
-                                    echo "\nError Message - " . $sessionsResponseObj->getMessage() . "\n";
-                                    if ( $sessionsResponseObj->getKeyName() ) {
-                                        echo "\nError Key Name - " . $sessionsResponseObj->getKeyName() . "\n";
+                                    echo "\nError Code - " . $documentDetailsResponseObj->getCode() . "\n";
+                                    echo "\nError Message - " . $documentDetailsResponseObj->getMessage() . "\n";
+                                    if ( $documentDetailsResponseObj->getKeyName() ) {
+                                        echo "\nError Key Name - " . $documentDetailsResponseObj->getKeyName() . "\n";
                                     }
-                                    if ( $sessionsResponseObj->getParameterName() ) {
-                                        echo "\nError Parameter Name - " . $sessionsResponseObj->getParameterName() . "\n";
+                                    if ( $documentDetailsResponseObj->getParameterName() ) {
+                                        echo "\nError Parameter Name - " . $documentDetailsResponseObj->getParameterName() . "\n";
                                     }
                                 } else {
                                     echo "\nRequest not completed successfully\n";
@@ -153,5 +133,4 @@ class GetSessionDetails {
     }
 }
 
-GetSessionDetails::execute();
-
+GetPdfDocumentDetails::execute();

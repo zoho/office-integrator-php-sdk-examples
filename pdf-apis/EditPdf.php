@@ -1,6 +1,8 @@
 <?php
 namespace com\zoho\officeintegrator\v1\writer;
 
+use com\zoho\officeintegrator\v1\EditPdfParameters;
+
 require_once dirname(__FILE__) . '/../vendor/autoload.php';
 
 
@@ -12,17 +14,16 @@ use com\zoho\officeintegrator\logger\LogBuilder;
 use com\zoho\officeintegrator\v1\Authentication;
 use com\zoho\officeintegrator\v1\CallbackSettings;
 use com\zoho\officeintegrator\v1\CreateDocumentResponse;
-use com\zoho\officeintegrator\v1\CreatePresentationParameters;
 use com\zoho\officeintegrator\v1\InvalidConfigurationException;
 use com\zoho\officeintegrator\v1\DocumentInfo;
+use com\zoho\officeintegrator\v1\PdfEditorSettings;
 use com\zoho\officeintegrator\v1\UserInfo;
 use com\zoho\officeintegrator\v1\V1Operations;
-use com\zoho\officeintegrator\v1\ZohoShowEditorSettings;
 use Exception;
 
-class CreatePresentation {
+class EditPdf {
 
-    //Refer API documentation - https://www.zoho.com/officeintegrator/api/v1/zoho-show-create-presentation.html
+    //Refer API documentation - https://www.zoho.com/officeintegrator/api/v1/zoho-show-co-edit-presentation-v1.html
     public static function execute() {
         // Initializing SDK once is enough. Calling here since the code sample will be tested standalone. 
         // You can place SDK initializer code in your application and call it once while your application starts up.
@@ -30,18 +31,23 @@ class CreatePresentation {
 
         try {
             $sdkOperations = new V1Operations();
-            $parameters = new CreatePresentationParameters();
+            $parameters = new EditPdfParameters();
 
-            # Optional Configuration 
+            $url = 'https://demo.office-integrator.com/zdocs/EventForm.pdf';
+            $parameters->setUrl($url);
+
+            // Either you can give the document as publicly downloadable url as above or add the file in request body itself using below code.
+            // $filePath = getcwd() . DIRECTORY_SEPARATOR . "sample_documents" . DIRECTORY_SEPARATOR . "Zoho_Show.pptx";
+            // $parameters->setDocument(new StreamWrapper(null, null, $filePath));
+
             $documentInfo = new DocumentInfo();
 
             // Time value used to generate a unique document every time. You can replace it based on your application.
             $documentInfo->setDocumentId(strval(time()));
-            $documentInfo->setDocumentName("New Presentation");
+            $documentInfo->setDocumentName("EventForm.pdf");
 
             $parameters->setDocumentInfo($documentInfo);
 
-            # Optional Configuration 
             $userInfo = new UserInfo();
 
             $userInfo->setUserId("100");
@@ -49,23 +55,13 @@ class CreatePresentation {
 
             $parameters->setUserInfo($userInfo);
 
-            # Optional Configuration 
-            $editorSettings = new ZohoShowEditorSettings();
+            $editorSettings = new PdfEditorSettings();
 
+            $editorSettings->setUnit("in");
             $editorSettings->setLanguage("en");
 
             $parameters->setEditorSettings($editorSettings);
 
-            # Optional Configuration 
-            $permissions = array();
-
-            $permissions["document.export"] = "true";
-            $permissions["document.print"] = "true";
-            $permissions["document.edit"] = "true";
-
-            $parameters->setPermissions($permissions);
-
-            # Optional Configuration 
             $callbackSettings = new CallbackSettings();
             $saveUrlParams = array();
 
@@ -79,43 +75,43 @@ class CreatePresentation {
             $saveUrlHeaders["header1"] = "value1";
             $saveUrlHeaders["header2"] = "value2";
 
-            //$callbackSettings->setSaveUrlHeaders($saveUrlHeaders);
+            $callbackSettings->setSaveUrlHeaders($saveUrlHeaders);
 
             $callbackSettings->setRetries(1);
-            $callbackSettings->setSaveFormat("pptx");
+            $callbackSettings->setSaveFormat("pdf");
             $callbackSettings->setHttpMethodType("post");
             $callbackSettings->setTimeout(100000);
             $callbackSettings->setSaveUrl("https://officeintegrator.zoho.com/v1/api/webhook/savecallback/601e12157123434d4e6e00cc3da2406df2b9a1d84a903c6cfccf92c8286");
 
             $parameters->setCallbackSettings($callbackSettings);
 
-            $responseObject = $sdkOperations->createPresentation($parameters);
+            $responseObject = $sdkOperations->editPdf($parameters);
 
             if ($responseObject != null) {
                 // Get the status code from response
                 echo "\nStatus Code: " . $responseObject->getStatusCode() . "\n";
 
                 // Get the api response object from responseObject
-                $presentationResponseObject = $responseObject->getObject();
+                $pdfResponseObj = $responseObject->getObject();
 
-                if ($presentationResponseObject != null) {
+                if ($pdfResponseObj != null) {
                     // Check if the expected CreateDocumentResponse instance is received
-                    if ($presentationResponseObject instanceof CreateDocumentResponse) {
-                        echo "\nDocument ID - " . $presentationResponseObject->getDocumentId() . "\n";
-                        echo "\nDocument session ID - " . $presentationResponseObject->getSessionId() . "\n";
-                        echo "\nDocument session URL - " . $presentationResponseObject->getDocumentUrl() . "\n";
-                        echo "\nDocument save URL - " . $presentationResponseObject->getSaveUrl() . "\n";
-                        echo "\nDocument delete URL - " . $presentationResponseObject->getDocumentDeleteUrl() . "\n";
-                        echo "\nDocument session delete URL - " . $presentationResponseObject->getSessionDeleteUrl() . "\n";
-                    } elseif ($presentationResponseObject instanceof InvalidConfigurationException) {
+                    if ($pdfResponseObj instanceof CreateDocumentResponse) {
+                        echo "\nPdf ID - " . $pdfResponseObj->getDocumentId() . "\n";
+                        echo "\nPdf Session ID - " . $pdfResponseObj->getSessionId() . "\n";
+                        echo "\nPdf Session URL - " . $pdfResponseObj->getDocumentUrl() . "\n";
+                        echo "\nPdf Session save URL - " . $pdfResponseObj->getSaveUrl() . "\n";
+                        echo "\nPdf delete URL - " . $pdfResponseObj->getDocumentDeleteUrl() . "\n";
+                        echo "\nPdf Session delete URL - " . $pdfResponseObj->getSessionDeleteUrl() . "\n";
+                    } elseif ($pdfResponseObj instanceof InvalidConfigurationException) {
                         echo "\nInvalid configuration exception." . "\n";
-                        echo "\nError Code - " . $presentationResponseObject->getCode() . "\n";
-                        echo "\nError Message - " . $presentationResponseObject->getMessage() . "\n";
-                        if ( $presentationResponseObject->getKeyName() ) {
-                            echo "\nError Key Name - " . $presentationResponseObject->getKeyName() . "\n";
+                        echo "\nError Code - " . $pdfResponseObj->getCode() . "\n";
+                        echo "\nError Message - " . $pdfResponseObj->getMessage() . "\n";
+                        if ( $pdfResponseObj->getKeyName() ) {
+                            echo "\nError Key Name - " . $pdfResponseObj->getKeyName() . "\n";
                         }
-                        if ( $presentationResponseObject->getParameterName() ) {
-                            echo "\nError Parameter Name - " . $presentationResponseObject->getParameterName() . "\n";
+                        if ( $pdfResponseObj->getParameterName() ) {
+                            echo "\nError Parameter Name - " . $pdfResponseObj->getParameterName() . "\n";
                         }
                     } else {
                         echo "\nRequest not completed successfully\n";
@@ -156,5 +152,5 @@ class CreatePresentation {
     }
 }
 
-CreatePresentation::execute();
+EditPdf::execute();
 
